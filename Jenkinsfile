@@ -1,8 +1,8 @@
 pipeline{
     agent any
     tools{
-        jdk 'JDK8'
-        nodejs 'NodeJS'
+        jdk 'JDK17'
+        nodejs 'node16'
     }
     environment {
         SCANNER_HOME=tool 'sonnar-scanner'
@@ -15,12 +15,12 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/ravipramoth/Devsecops-Project1.git'
+                git branch: 'main', url: 'https://github.com/MahammadArifGutala/Devsecops-Project1.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
-                withSonarQubeEnv('sonar-server') {
+                withSonarQubeEnv(credentialsId: 'Sonar-token') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Game \
                     -Dsonar.projectKey=Game '''
                 }
@@ -29,7 +29,7 @@ pipeline{
         stage("quality gate"){
            steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-cred' 
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
                 }
             } 
         }
